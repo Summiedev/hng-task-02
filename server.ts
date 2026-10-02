@@ -232,17 +232,8 @@ app.post('/api/auth/google', async (req: Request, res: Response) => {
       }
     }
 
-    // Fallback: parse JWT payload if verification fails due to mismatched audience during dev testing
     if (!payload) {
-      try {
-        const parts = credential.split('.');
-        if (parts.length === 3) {
-          const buff = Buffer.from(parts[1], 'base64');
-          payload = JSON.parse(buff.toString('utf-8'));
-        }
-      } catch (parseErr) {
-        return res.status(400).json({ error: 'Invalid Google credential token' });
-      }
+      return res.status(401).json({ error: 'Google credential verification failed' });
     }
 
     if (!payload || !payload.email) {
@@ -267,34 +258,6 @@ app.post('/api/auth/google', async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error('[Auth /api/auth/google] Sign-in error:', err.message);
     res.status(500).json({ error: err.message || 'Google authentication failed' });
-  }
-});
-
-// Auth: One-Click Google Testing Sign-In (using authenticated user email)
-app.post('/api/auth/demo-google', async (req: Request, res: Response) => {
-  try {
-    const email = req.body.email || 'apatirasummie@gmail.com';
-    const name = req.body.name || 'Summie Apatira';
-
-    const user = await db.upsertUser({
-      google_id: `google-user-${email.replace(/[^a-zA-Z0-9]/g, '')}`,
-      email,
-      name,
-      avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-        name
-      )}&backgroundColor=A93B24&textColor=ffffff`,
-    });
-
-    const token = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    sessionTokens.set(token, user.id);
-
-    res.json({
-      success: true,
-      token,
-      user,
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message || 'Quick login failed' });
   }
 });
 

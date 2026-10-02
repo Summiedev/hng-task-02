@@ -8,7 +8,6 @@ interface AuthContextType {
   error: string | null;
   googleClientId: string;
   loginWithGoogleCredential: (credential: string) => Promise<boolean>;
-  loginDemo: (email?: string, name?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
@@ -109,33 +108,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginDemo = async (email = 'apatirasummie@gmail.com', name = 'Summie Apatira'): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/auth/demo-google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Sign in failed');
-      }
-
-      localStorage.setItem(TOKEN_KEY, data.token);
-      setToken(data.token);
-      setUser(data.user);
-      return true;
-    } catch (err: any) {
-      setError(err.message || 'Demo sign in failed');
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -168,7 +140,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error,
         googleClientId,
         loginWithGoogleCredential,
-        loginDemo,
         logout,
         clearError,
         refreshUser,
