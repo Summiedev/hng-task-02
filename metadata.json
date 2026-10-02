@@ -1,0 +1,6 @@
+{
+  "name": "KOKO MARKET — Lagos Pantry & Provisions",
+  "description": "A Lagos pantry for Nigerian sauces, spices, snacks, grains and drinks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
