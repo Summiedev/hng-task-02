@@ -18,7 +18,10 @@ const googleAuthClient = new OAuth2Client(googleClientId);
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 const supabaseClient = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
-const sessionSecret = process.env.SESSION_SECRET || 'koko-market-development-session-secret';
+// SESSION_SECRET is preferred. The server-only Supabase service key is a stable
+// fallback for existing deployments that already have it configured, so a
+// missing optional variable does not silently invalidate sessions per request.
+const sessionSecret = process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'koko-market-development-session-secret';
 
 const app = express();
 app.use(express.json());
@@ -94,6 +97,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
     service: 'api',
     supabaseConfigured: Boolean(supabaseClient),
     mailgunConfigured: Boolean(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN),
+    databaseConfigured: Boolean(
+      process.env.DATABASE_URL ||
+      process.env.NEON_DATABASE_URL ||
+      (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
+    ),
+    sessionConfigured: Boolean(process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY),
     persistence: db.persistenceMode,
   });
 });
@@ -208,6 +217,24 @@ app.post('/api/orders', async (req: Request, res: Response) => {
     const emailResult = await sendOrderConfirmationEmail(order);
     order.mailgun_status = emailResult.status;
     order.email_preview = emailResult.preview;
+
+    if (emailResult.status === 'failed') {
+      return res.status(502).json({
+        success: false,
+        error: 'Your order was saved, but the confirmation email could not be sent. Please try again so we can retry the email without creating another order.',
+        order,
+        mailgunStatus: emailResult.status,
+      });
+    }
+
+    if (emailResult.status === 'preview_mode' && isProduction) {
+      return res.status(503).json({
+        success: false,
+        error: 'Your order was saved, but email delivery is not configured in production. Add the Mailgun variables and retry the confirmation email.',
+        order,
+        mailgunStatus: emailResult.status,
+      });
+    }
 
     res.status(201).json({
       success: true,

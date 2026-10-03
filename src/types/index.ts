@@ -77,7 +77,7 @@ export interface Order {
   subtotal: number;
   total: number;
   status: 'confirmed' | 'processing' | 'shipped' | 'delivered';
-  payment_status: 'paid';
+  payment_status: 'pending' | 'paid';
   mailgun_status: 'sent' | 'queued' | 'preview_mode' | 'failed';
   idempotency_key?: string;
   created_at: string;

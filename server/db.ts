@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Category, Order, OrderItem, Product, User } from '../src/types/index.js';
 import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from './data/initialData.js';
 import { getSelectedUnit } from '../src/utils/product.js';
@@ -35,6 +36,8 @@ interface DatabaseStore {
 class DatabaseService {
   private isPostgres = false;
   private pgPool: pg.Pool | null = null;
+  private isSupabase = false;
+  private supabaseDb: SupabaseClient | null = null;
   private initialization: Promise<void> = Promise.resolve();
   private localStore: DatabaseStore = {
     users: [],
@@ -54,8 +57,10 @@ class DatabaseService {
     await this.initialization;
   }
 
-  public get persistenceMode(): 'postgres' | 'local' {
-    return this.isPostgres ? 'postgres' : 'local';
+  public get persistenceMode(): 'postgres' | 'supabase' | 'local' {
+    if (this.isPostgres) return 'postgres';
+    if (this.isSupabase) return 'supabase';
+    return 'local';
   }
 
   private ensureDir() {
@@ -148,6 +153,57 @@ class DatabaseService {
     } else {
       console.log('[DB] Operating with persistent relational database engine.');
     }
+
+    if (!this.isPostgres) await this.initSupabasePersistence();
+  }
+
+  private async initSupabasePersistence() {
+    const url = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !serviceKey) return;
+
+    const client = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    try {
+      const { error: categoryCheckError } = await client.from('categories').select('id').limit(1);
+      if (categoryCheckError) throw categoryCheckError;
+
+      const { error: categorySeedError } = await client.from('categories').upsert(INITIAL_CATEGORIES, { onConflict: 'id' });
+      if (categorySeedError) throw categorySeedError;
+
+      const productRows = INITIAL_PRODUCTS.map((prod) => ({
+        id: prod.id,
+        slug: prod.slug,
+        name: prod.name,
+        description: prod.description,
+        detailed_description: prod.detailed_description,
+        price: prod.price,
+        category_id: prod.category_id,
+        category_slug: prod.category_slug,
+        image: prod.image,
+        hover_image: prod.hover_image || null,
+        gallery: prod.gallery || [prod.image],
+        stock: prod.stock,
+        sku: prod.sku,
+        weight: prod.weight,
+        ingredients: prod.ingredients,
+        allergen_info: prod.allergen_info || '',
+        storage_info: prod.storage_info,
+        unit_options: prod.unit_options || [{ label: prod.weight, price: prod.price }],
+        sizes: prod.sizes || [],
+        colors: prod.colors || [],
+        is_featured: prod.is_featured,
+        is_bestseller: prod.is_bestseller || false,
+        created_at: prod.created_at,
+      }));
+      const { error: productSeedError } = await client.from('products').upsert(productRows, { onConflict: 'id' });
+      if (productSeedError) throw productSeedError;
+
+      this.supabaseDb = client;
+      this.isSupabase = true;
+      console.log('[DB] Supabase REST persistence connected and catalogue verified.');
+    } catch (err) {
+      console.warn('[DB] Supabase REST persistence unavailable; local fallback remains active:', (err as Error).message);
+    }
   }
 
   private async initPostgresSchema() {
@@ -223,7 +279,7 @@ class DatabaseService {
         subtotal INTEGER NOT NULL,
         total INTEGER NOT NULL,
         status TEXT NOT NULL DEFAULT 'confirmed',
-        payment_status TEXT NOT NULL DEFAULT 'paid',
+        payment_status TEXT NOT NULL DEFAULT 'pending',
         mailgun_status TEXT NOT NULL DEFAULT 'queued',
         idempotency_key TEXT UNIQUE,
         created_at TIMESTAMPTZ DEFAULT NOW()
@@ -349,6 +405,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying categories:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('categories').select('*');
+      if (error) console.error('[DB] Error querying Supabase categories:', error.message);
+      else cats = (data || []) as Category[];
     } else {
       cats = this.localStore.categories;
     }
@@ -374,6 +434,14 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying products from postgres, falling back to cache:', err);
         list = [...this.localStore.products];
+      }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('products').select('*').in('id', INITIAL_PRODUCTS.map((product) => product.id));
+      if (error) {
+        console.error('[DB] Error querying products from Supabase, falling back to cache:', error.message);
+        list = [...this.localStore.products];
+      } else {
+        list = (data || []) as Product[];
       }
     } else {
       list = [...this.localStore.products];
@@ -421,6 +489,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying product by slug:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('products').select('*').eq('slug', slug).in('id', INITIAL_PRODUCTS.map((product) => product.id)).maybeSingle();
+      if (error) console.error('[DB] Error querying Supabase product by slug:', error.message);
+      if (data) return data as Product;
     }
     return this.localStore.products.find((p) => p.slug === slug) || null;
   }
@@ -433,6 +505,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying product by id:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('products').select('*').eq('id', id).in('id', INITIAL_PRODUCTS.map((product) => product.id)).maybeSingle();
+      if (error) console.error('[DB] Error querying Supabase product by id:', error.message);
+      if (data) return data as Product;
     }
     return this.localStore.products.find((p) => p.id === id) || null;
   }
@@ -447,6 +523,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying user by email:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('users').select('*').ilike('email', cleanEmail).maybeSingle();
+      if (error) console.error('[DB] Error querying Supabase user by email:', error.message);
+      if (data) return data as User;
     }
     return this.localStore.users.find((u) => u.email.toLowerCase() === cleanEmail) || null;
   }
@@ -459,6 +539,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying user by id:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data, error } = await this.supabaseDb.from('users').select('*').eq('id', id).maybeSingle();
+      if (error) console.error('[DB] Error querying Supabase user by id:', error.message);
+      if (data) return data as User;
     }
     return this.localStore.users.find((u) => u.id === id) || null;
   }
@@ -490,6 +574,11 @@ class DatabaseService {
         }
       }
 
+      if (this.isSupabase && this.supabaseDb) {
+        const { error } = await this.supabaseDb.from('users').update({ name: existing.name, avatar_url: existing.avatar_url, google_id: existing.google_id }).eq('id', existing.id);
+        if (error) throw new Error(`Could not update Supabase user: ${error.message}`);
+      }
+
       const idx = this.localStore.users.findIndex((u) => u.id === existing?.id);
       if (idx >= 0) this.localStore.users[idx] = existing;
       this.saveLocal();
@@ -515,6 +604,11 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error inserting user in postgres:', err);
       }
+    }
+
+    if (this.isSupabase && this.supabaseDb) {
+      const { error } = await this.supabaseDb.from('users').insert(newUser);
+      if (error) throw new Error(`Could not save Supabase user: ${error.message}`);
     }
 
     this.localStore.users.push(newUser);
@@ -555,6 +649,16 @@ class DatabaseService {
             return ord;
           }
         } catch {}
+      }
+
+      if (this.isSupabase && this.supabaseDb) {
+        const { data: existing, error } = await this.supabaseDb.from('orders').select('*').eq('idempotency_key', orderInput.idempotency_key).maybeSingle();
+        if (error) throw new Error(`Could not check Supabase order idempotency: ${error.message}`);
+        if (existing) {
+          const { data: existingItems, error: itemError } = await this.supabaseDb.from('order_items').select('*').eq('order_id', existing.id);
+          if (itemError) throw new Error(`Could not load Supabase order items: ${itemError.message}`);
+          return { ...existing, items: (existingItems || []) as OrderItem[] } as Order;
+        }
       }
 
       const existing = this.localStore.orders.find(
@@ -622,6 +726,11 @@ class DatabaseService {
         }
       }
 
+      if (this.isSupabase && this.supabaseDb) {
+        const { data, error } = await this.supabaseDb.from('products').update({ stock: prep.product.stock }).eq('id', prep.product.id).gte('stock', prep.quantity).select('id').maybeSingle();
+        if (error || !data) throw new Error(`Could not update Supabase stock for ${prep.product.name}`);
+      }
+
       const prodIndex = this.localStore.products.findIndex((p) => p.id === prep.product.id);
       if (prodIndex >= 0) {
         this.localStore.products[prodIndex].stock = prep.product.stock;
@@ -661,7 +770,7 @@ class DatabaseService {
       subtotal: calculatedSubtotal,
       total: calculatedTotal,
       status: 'confirmed',
-      payment_status: 'paid',
+      payment_status: 'pending',
       mailgun_status: 'queued',
       idempotency_key: orderInput.idempotency_key,
       created_at: new Date().toISOString(),
@@ -726,6 +835,16 @@ class DatabaseService {
       }
     }
 
+    if (this.isSupabase && this.supabaseDb) {
+      const orderRow = { ...newOrder } as Record<string, unknown>;
+      delete orderRow.items;
+      delete orderRow.email_preview;
+      const { error: orderError } = await this.supabaseDb.from('orders').insert(orderRow);
+      if (orderError) throw new Error(`Could not save Supabase order: ${orderError.message}`);
+      const { error: itemError } = await this.supabaseDb.from('order_items').insert(orderItems);
+      if (itemError) throw new Error(`Could not save Supabase order items: ${itemError.message}`);
+    }
+
     // Always update local cache & backup
     this.localStore.orders.unshift(newOrder);
     this.localStore.order_items.push(...orderItems);
@@ -753,11 +872,27 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying order by id from postgres:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data: order, error } = await this.supabaseDb.from('orders').select('*').or(`id.eq.${id},order_number.eq.${id}`).maybeSingle();
+      if (error) console.error('[DB] Error querying Supabase order by id:', error.message);
+      if (order) {
+        const { data: items } = await this.supabaseDb.from('order_items').select('*').eq('order_id', order.id);
+        return { ...order, items: (items || []) as OrderItem[] } as Order;
+      }
     }
 
     const order = this.localStore.orders.find((o) => o.id === id || o.order_number === id);
     if (!order) return null;
     return order;
+  }
+
+  private async attachSupabaseOrderItems(orders: Order[]): Promise<Order[]> {
+    if (!this.supabaseDb) return orders;
+    for (const order of orders) {
+      const { data: items } = await this.supabaseDb.from('order_items').select('*').eq('order_id', order.id);
+      order.items = (items || []) as OrderItem[];
+    }
+    return orders;
   }
 
   public async getOrdersByUser(userId: string): Promise<Order[]> {
@@ -779,6 +914,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying orders by user from postgres:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data: orders, error } = await this.supabaseDb.from('orders').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+      if (error) console.error('[DB] Error querying Supabase orders by user:', error.message);
+      return await this.attachSupabaseOrderItems((orders || []) as Order[]);
     }
 
     return this.localStore.orders.filter((o) => o.user_id === userId);
@@ -804,6 +943,10 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error querying orders by email from postgres:', err);
       }
+    } else if (this.isSupabase && this.supabaseDb) {
+      const { data: orders, error } = await this.supabaseDb.from('orders').select('*').ilike('customer_email', cleanEmail).order('created_at', { ascending: false });
+      if (error) console.error('[DB] Error querying Supabase orders by email:', error.message);
+      return await this.attachSupabaseOrderItems((orders || []) as Order[]);
     }
 
     return this.localStore.orders.filter((o) => o.customer_email.toLowerCase() === cleanEmail);
@@ -822,6 +965,11 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error updating mailgun status in postgres:', err);
       }
+    }
+
+    if (this.isSupabase && this.supabaseDb) {
+      const { error } = await this.supabaseDb.from('orders').update({ mailgun_status: status }).eq('id', orderId);
+      if (error) console.error('[DB] Error updating Supabase Mailgun status:', error.message);
     }
 
     const order = this.localStore.orders.find((o) => o.id === orderId);
@@ -863,6 +1011,11 @@ class DatabaseService {
       } catch (err) {
         console.error('[DB] Error logging email to postgres:', err);
       }
+    }
+
+    if (this.isSupabase && this.supabaseDb) {
+      const { error } = await this.supabaseDb.from('order_emails').insert({ id: emailId, ...record, created_at: now });
+      if (error) console.error('[DB] Error logging Supabase email:', error.message);
     }
 
     this.localStore.order_emails.push({

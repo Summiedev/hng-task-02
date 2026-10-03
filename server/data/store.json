@@ -82,7 +82,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-white-garri",
       "slug": "white-garri",
       "name": "White Garri",
@@ -128,7 +128,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-yellow-garri",
       "slug": "yellow-garri",
       "name": "Yellow Garri",
@@ -174,7 +174,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-ijebu-garri",
       "slug": "ijebu-garri",
       "name": "Ijebu Garri",
@@ -216,7 +216,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-ofada-rice",
       "slug": "ofada-rice",
       "name": "Ofada Rice",
@@ -226,10 +226,9 @@
       "category_id": "cat-rice",
       "category_slug": "rice-grains",
       "image": "/images/rice-market.jpg",
-      "hover_image": "/images/nigerian-jollof-restaurant.jpg",
+      "hover_image": "/images/rice-market.jpg",
       "gallery": [
-        "/images/rice-market.jpg",
-        "/images/nigerian-jollof-restaurant.jpg"
+        "/images/rice-market.jpg"
       ],
       "stock": 30,
       "sku": "KM-RIC-004",
@@ -258,7 +257,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-local-rice",
       "slug": "local-rice",
       "name": "Local Rice",
@@ -268,10 +267,9 @@
       "category_id": "cat-rice",
       "category_slug": "rice-grains",
       "image": "/images/rice-market.jpg",
-      "hover_image": "/images/nigerian-jollof-restaurant.jpg",
+      "hover_image": "/images/rice-market.jpg",
       "gallery": [
-        "/images/rice-market.jpg",
-        "/images/nigerian-jollof-restaurant.jpg"
+        "/images/rice-market.jpg"
       ],
       "stock": 40,
       "sku": "KM-RIC-005",
@@ -300,7 +298,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-honey-beans",
       "slug": "honey-beans",
       "name": "Honey Beans",
@@ -310,10 +308,9 @@
       "category_id": "cat-beans",
       "category_slug": "beans-legumes",
       "image": "/images/nigeria-beans-market.jpg",
-      "hover_image": "/images/nigeria-rice-beans-market.jpg",
+      "hover_image": "/images/nigeria-beans-market.jpg",
       "gallery": [
-        "/images/nigeria-beans-market.jpg",
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/nigeria-beans-market.jpg"
       ],
       "stock": 65,
       "sku": "KM-BEA-006",
@@ -346,7 +343,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-brown-beans",
       "slug": "brown-beans",
       "name": "Brown Beans",
@@ -390,7 +387,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-egusi",
       "slug": "egusi",
       "name": "Egusi",
@@ -399,11 +396,11 @@
       "price": 1800,
       "category_id": "cat-soups",
       "category_slug": "soups-swallows",
-      "image": "/images/nigerian-egusi-bowl.jpg",
-      "hover_image": "/images/nigerian-jollof-restaurant.jpg",
+      "image": "/images/nigerian-egusi-seeds.jpg",
+      "hover_image": "/images/nigerian-egusi-bowl.jpg",
       "gallery": [
-        "/images/nigerian-egusi-bowl.jpg",
-        "/images/nigerian-jollof-restaurant.jpg"
+        "/images/nigerian-egusi-seeds.jpg",
+        "/images/nigerian-egusi-bowl.jpg"
       ],
       "stock": 35,
       "sku": "KM-SOU-008",
@@ -432,7 +429,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-ogbono",
       "slug": "ogbono",
       "name": "Ogbono",
@@ -441,9 +438,10 @@
       "price": 2200,
       "category_id": "cat-soups",
       "category_slug": "soups-swallows",
-      "image": "/images/nigeria-rice-beans-market.jpg",
+      "image": "/images/ogbono-seeds.jpg",
+      "hover_image": "/images/ogbono-seeds.jpg",
       "gallery": [
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/ogbono-seeds.jpg"
       ],
       "stock": 28,
       "sku": "KM-SOU-009",
@@ -472,7 +470,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-crayfish",
       "slug": "crayfish",
       "name": "Crayfish",
@@ -481,11 +479,10 @@
       "price": 1500,
       "category_id": "cat-spices",
       "category_slug": "spices-seasoning",
-      "image": "/images/nigerian-dried-pepper.jpg",
-      "hover_image": "/images/nigeria-rice-beans-market.jpg",
+      "image": "/images/nigerian-dried-crayfish.jpg",
+      "hover_image": "/images/nigerian-dried-crayfish.jpg",
       "gallery": [
-        "/images/nigerian-dried-pepper.jpg",
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/nigerian-dried-crayfish.jpg"
       ],
       "stock": 44,
       "sku": "KM-SPC-010",
@@ -514,7 +511,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-dried-pepper",
       "slug": "dried-pepper",
       "name": "Dried Pepper",
@@ -524,10 +521,9 @@
       "category_id": "cat-spices",
       "category_slug": "spices-seasoning",
       "image": "/images/nigerian-dried-pepper.jpg",
-      "hover_image": "/images/nigeria-rice-beans-market.jpg",
+      "hover_image": "/images/nigerian-dried-pepper.jpg",
       "gallery": [
-        "/images/nigerian-dried-pepper.jpg",
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/nigerian-dried-pepper.jpg"
       ],
       "stock": 42,
       "sku": "KM-SPC-011",
@@ -556,7 +552,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-palm-oil",
       "slug": "palm-oil",
       "name": "Palm Oil",
@@ -566,10 +562,9 @@
       "category_id": "cat-oils",
       "category_slug": "oils",
       "image": "/images/palm-oil-bottles.jpg",
-      "hover_image": "/images/nigeria-rice-beans-market.jpg",
+      "hover_image": "/images/palm-oil-bottles.jpg",
       "gallery": [
-        "/images/palm-oil-bottles.jpg",
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/palm-oil-bottles.jpg"
       ],
       "stock": 24,
       "sku": "KM-OIL-012",
@@ -598,7 +593,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-ugu",
       "slug": "ugu",
       "name": "Ugu Leaves",
@@ -607,9 +602,10 @@
       "price": 800,
       "category_id": "cat-vegetables",
       "category_slug": "vegetables",
-      "image": "/images/nigeria-rice-beans-market.jpg",
+      "image": "/images/ugu-leaves.jpg",
+      "hover_image": "/images/ugu-leaves.jpg",
       "gallery": [
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/ugu-leaves.jpg"
       ],
       "stock": 20,
       "sku": "KM-VEG-013",
@@ -634,7 +630,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-plantain",
       "slug": "plantain",
       "name": "Plantain",
@@ -644,10 +640,9 @@
       "category_id": "cat-tubers",
       "category_slug": "tubers",
       "image": "/images/plantain-market.jpg",
-      "hover_image": "/images/nigeria-rice-beans-market.jpg",
+      "hover_image": "/images/plantain-market.jpg",
       "gallery": [
-        "/images/plantain-market.jpg",
-        "/images/nigeria-rice-beans-market.jpg"
+        "/images/plantain-market.jpg"
       ],
       "stock": 26,
       "sku": "KM-TUB-014",
@@ -676,7 +671,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-yam-flour",
       "slug": "yam-flour",
       "name": "Yam Flour",
@@ -685,11 +680,10 @@
       "price": 2800,
       "category_id": "cat-soups",
       "category_slug": "soups-swallows",
-      "image": "/images/nigerian-egusi-bowl.jpg",
-      "hover_image": "/images/nigerian-jollof-restaurant.jpg",
+      "image": "/images/yam-flour-elubo.jpg",
+      "hover_image": "/images/yam-flour-elubo.jpg",
       "gallery": [
-        "/images/nigerian-egusi-bowl.jpg",
-        "/images/nigerian-jollof-restaurant.jpg"
+        "/images/yam-flour-elubo.jpg"
       ],
       "stock": 32,
       "sku": "KM-SOU-015",
@@ -718,7 +712,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-zobo",
       "slug": "zobo",
       "name": "Zobo",
@@ -727,8 +721,11 @@
       "price": 1200,
       "category_id": "cat-breakfast",
       "category_slug": "drinks-breakfast",
-      "image": "",
-      "gallery": [],
+      "image": "/images/dried-hibiscus-zobo.jpg",
+      "hover_image": "/images/dried-hibiscus-zobo.jpg",
+      "gallery": [
+        "/images/dried-hibiscus-zobo.jpg"
+      ],
       "stock": 38,
       "sku": "KM-BRK-016",
       "weight": "100g",
@@ -756,7 +753,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-stockfish",
       "slug": "stockfish",
       "name": "Stockfish",
@@ -765,8 +762,11 @@
       "price": 4500,
       "category_id": "cat-fish",
       "category_slug": "fish-seafood",
-      "image": "",
-      "gallery": [],
+      "image": "/images/stockfish-market.jpg",
+      "hover_image": "/images/stockfish-market.jpg",
+      "gallery": [
+        "/images/stockfish-market.jpg"
+      ],
       "stock": 18,
       "sku": "KM-FSH-017",
       "weight": "250g",
@@ -794,7 +794,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-beef",
       "slug": "beef-cuts",
       "name": "Beef Cuts",
@@ -803,8 +803,11 @@
       "price": 5000,
       "category_id": "cat-meat",
       "category_slug": "meat",
-      "image": "",
-      "gallery": [],
+      "image": "/images/nigerian-beef-suya.jpg",
+      "hover_image": "/images/nigerian-beef-suya.jpg",
+      "gallery": [
+        "/images/nigerian-beef-suya.jpg"
+      ],
       "stock": 14,
       "sku": "KM-MEA-018",
       "weight": "500g",
@@ -832,7 +835,7 @@
       "sizes": [],
       "colors": [],
       "created_at": "2026-01-01T10:00:00Z",
-      "image_note": "Reference photo from a Lagos food market. Koko product photography coming soon.",
+      "image_note": "Reference photograph from a Nigerian market or kitchen.",
       "id": "prod-kuli-kuli",
       "slug": "kuli-kuli",
       "name": "Kuli Kuli",
@@ -841,8 +844,11 @@
       "price": 1500,
       "category_id": "cat-pantry",
       "category_slug": "pantry-essentials",
-      "image": "",
-      "gallery": [],
+      "image": "/images/kuli-kuli.jpg",
+      "hover_image": "/images/kuli-kuli.jpg",
+      "gallery": [
+        "/images/kuli-kuli.jpg"
+      ],
       "stock": 30,
       "sku": "KM-PAN-019",
       "weight": "250g",
