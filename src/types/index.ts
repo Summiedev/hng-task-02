@@ -7,6 +7,11 @@ export interface Category {
   item_count?: number;
 }
 
+export interface UnitOption {
+  label: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -22,6 +27,7 @@ export interface Product {
   stock: number;
   sku: string;
   weight: string;
+  unit_options?: UnitOption[];
   ingredients: string;
   allergen_info?: string;
   storage_info: string;
@@ -90,6 +96,7 @@ export interface CartItem {
   quantity: number;
   selectedSize?: string;
   selectedColor?: string;
+  unitPrice?: number;
 }
 
 export interface CheckoutFormData {

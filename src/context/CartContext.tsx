@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { CartItem, Product } from '../types/index.js';
+import { getSelectedUnit } from '../utils/product.js';
 
 interface CartContextType {
   items: CartItem[];
@@ -91,10 +92,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let message: string | undefined;
     let success = true;
+    const selectedUnit = getSelectedUnit(product, selectedSize);
 
     setItems((prev) => {
       const existingIndex = prev.findIndex(
-        (item) => item.product.id === product.id
+        (item) => item.product.id === product.id && item.selectedSize === selectedUnit.label
       );
 
       if (existingIndex > -1) {
@@ -121,8 +123,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           {
             product,
             quantity: initialQty,
-            selectedSize: undefined,
+            selectedSize: selectedUnit.label,
             selectedColor: undefined,
+            unitPrice: selectedUnit.price,
           },
         ];
       }
@@ -166,7 +169,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 
-  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.unitPrice || item.product.price) * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const total = subtotal > 0 ? subtotal + deliveryFee : 0;
 

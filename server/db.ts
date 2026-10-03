@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { Category, Order, OrderItem, Product, User } from '../src/types/index.js';
 import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from './data/initialData.js';
+import { getSelectedUnit } from '../src/utils/product.js';
 
 const { Pool } = pg;
 
@@ -34,6 +35,7 @@ interface DatabaseStore {
 class DatabaseService {
   private isPostgres = false;
   private pgPool: pg.Pool | null = null;
+  private initialization: Promise<void> = Promise.resolve();
   private localStore: DatabaseStore = {
     users: [],
     categories: [],
@@ -45,7 +47,11 @@ class DatabaseService {
 
   constructor() {
     this.loadLocal();
-    this.init();
+    this.initialization = this.init();
+  }
+
+  public async waitUntilReady() {
+    await this.initialization;
   }
 
   private ensureDir() {
@@ -171,6 +177,7 @@ class DatabaseService {
         ingredients TEXT,
         allergen_info TEXT,
         storage_info TEXT,
+        unit_options JSONB,
         sizes TEXT[],
         colors TEXT[],
         is_featured BOOLEAN DEFAULT FALSE,
@@ -181,6 +188,7 @@ class DatabaseService {
       ALTER TABLE products ADD COLUMN IF NOT EXISTS gallery TEXT[];
       ALTER TABLE products ADD COLUMN IF NOT EXISTS sizes TEXT[];
       ALTER TABLE products ADD COLUMN IF NOT EXISTS colors TEXT[];
+      ALTER TABLE products ADD COLUMN IF NOT EXISTS unit_options JSONB;
       ALTER TABLE products ADD COLUMN IF NOT EXISTS is_bestseller BOOLEAN DEFAULT FALSE;
     `);
 
@@ -228,8 +236,10 @@ class DatabaseService {
         product_image TEXT NOT NULL,
         quantity INTEGER NOT NULL,
         unit_price INTEGER NOT NULL,
-        total_price INTEGER NOT NULL
+        total_price INTEGER NOT NULL,
+        selected_size TEXT
       );
+      ALTER TABLE order_items ADD COLUMN IF NOT EXISTS selected_size TEXT;
     `);
 
     await this.pgPool.query(`
@@ -265,10 +275,10 @@ class DatabaseService {
         `INSERT INTO products (
           id, slug, name, description, detailed_description, price, category_id,
           category_slug, image, hover_image, gallery, stock, sku, weight, ingredients, allergen_info,
-          storage_info, sizes, colors, is_featured, is_bestseller, created_at
+          storage_info, unit_options, sizes, colors, is_featured, is_bestseller, created_at
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
         )
         ON CONFLICT (id) DO UPDATE SET
           slug = EXCLUDED.slug,
@@ -287,6 +297,7 @@ class DatabaseService {
           ingredients = EXCLUDED.ingredients,
           allergen_info = EXCLUDED.allergen_info,
           storage_info = EXCLUDED.storage_info,
+          unit_options = EXCLUDED.unit_options,
           sizes = EXCLUDED.sizes,
           colors = EXCLUDED.colors,
           is_featured = EXCLUDED.is_featured,
@@ -309,6 +320,7 @@ class DatabaseService {
           prod.ingredients,
           prod.allergen_info || '',
           prod.storage_info,
+          JSON.stringify(prod.unit_options || [{ label: prod.weight, price: prod.price }]),
           prod.sizes || [],
           prod.colors || [],
           prod.is_featured,
@@ -579,15 +591,16 @@ class DatabaseService {
         );
       }
 
-      const itemTotal = product.price * item.quantity;
+      const selectedUnit = getSelectedUnit(product, item.selectedSize);
+      const itemTotal = selectedUnit.price * item.quantity;
       calculatedSubtotal += itemTotal;
 
       preparedItems.push({
         product,
         quantity: item.quantity,
-        unit_price: product.price,
+        unit_price: selectedUnit.price,
         total_price: itemTotal,
-        selected_size: item.selectedSize || 'Standard',
+        selected_size: selectedUnit.label,
       });
     }
 
@@ -688,8 +701,8 @@ class DatabaseService {
           await this.pgPool.query(
             `INSERT INTO order_items (
               id, order_id, product_id, product_name, product_sku, product_image,
-              quantity, unit_price, total_price
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`,
+              quantity, unit_price, total_price, selected_size
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`,
             [
               item.id,
               item.order_id,
@@ -700,6 +713,7 @@ class DatabaseService {
               item.quantity,
               item.unit_price,
               item.total_price,
+              item.selected_size,
             ]
           );
         }

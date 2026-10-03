@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { CartProvider } from './context/CartContext.js';
 import { AuthProvider } from './context/AuthContext.js';
 import { Navbar } from './components/Navbar.js';
@@ -14,10 +13,12 @@ import { OrderConfirmationPage } from './pages/OrderConfirmationPage.js';
 import { AccountPage } from './pages/AccountPage.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { Order, Product } from './types/index.js';
+import { fetchJson } from './utils/api.js';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<string>('home');
   const [currentCategory, setCurrentCategory] = useState<string>('all');
+  const [currentSearch, setCurrentSearch] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -35,13 +36,10 @@ export default function App() {
       } else if (hash.startsWith('product/')) {
         const slug = hash.split('/')[1];
         if (slug) {
-          fetch(`/api/products/${slug}`)
-            .then((res) => (res.ok ? res.json() : null))
+          fetchJson<Product>(`/api/products/${slug}`)
             .then((prod) => {
-              if (prod) {
-                setSelectedProduct(prod);
-                setCurrentPage('product');
-              }
+              setSelectedProduct(prod);
+              setCurrentPage('product');
             })
             .catch(() => {});
         }
@@ -59,14 +57,16 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const navigateTo = (page: string, param?: string) => {
+  const navigateTo = (page: string, param?: string, query?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (page === 'home') {
       window.location.hash = '#home';
       setCurrentPage('home');
+      setCurrentSearch('');
     } else if (page === 'shop') {
       const cat = param || 'all';
       setCurrentCategory(cat);
+      setCurrentSearch(query || '');
       window.location.hash = cat !== 'all' ? `#shop/${cat}` : '#shop';
       setCurrentPage('shop');
     } else if (page === 'checkout') {
@@ -119,19 +119,12 @@ export default function App() {
 
           {/* Page transitions */}
           <main className="flex-1 overflow-x-hidden">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={getPageKey()}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full"
-              >
+            <div key={getPageKey()} className="w-full">
                 {currentPage === 'home' && (
                   <HomePage
                     onSelectProduct={handleSelectProduct}
                     onSelectCategory={(cat) => navigateTo('shop', cat)}
+                    onSelectMeal={(term) => navigateTo('shop', 'all', term)}
                     onNavigateToShop={() => navigateTo('shop')}
                   />
                 )}
@@ -139,6 +132,7 @@ export default function App() {
                 {currentPage === 'shop' && (
                   <ShopPage
                     initialCategory={currentCategory}
+                    initialQuery={currentSearch}
                     onSelectProduct={handleSelectProduct}
                   />
                 )}
@@ -179,8 +173,7 @@ export default function App() {
                 {currentPage === 'about' && (
                   <AboutPage onNavigateToShop={() => navigateTo('shop')} />
                 )}
-              </motion.div>
-            </AnimatePresence>
+            </div>
           </main>
 
           {/* Cart drawer */}
