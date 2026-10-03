@@ -34,12 +34,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
       </button>
 
       <div className="flex flex-1 flex-col px-1 pb-1 pt-3">
-        <div className="flex flex-col gap-2 min-[390px]:flex-row min-[390px]:items-start min-[390px]:justify-between min-[390px]:gap-3">
+        <div className="flex flex-col gap-2 min-[480px]:flex-row min-[480px]:items-start min-[480px]:justify-between min-[480px]:gap-3">
           <button type="button" onClick={() => onSelect(product)} className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8472e]">
             <p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#b8472e]">{product.category_slug.replaceAll('-', ' ')}</p>
             <h3 className="mt-1 font-display text-[1.15rem] font-bold leading-[0.98] tracking-[-0.035em] text-[#1d2a1d] sm:text-[1.35rem]">{product.name}</h3>
           </button>
-          <div className="shrink-0 text-left min-[390px]:text-right">
+          <div className="shrink-0 text-left min-[480px]:text-right">
             <p className="text-[0.95rem] font-black text-[#1d2a1d] sm:text-base">{formatNaira(selectedUnit.price)}</p>
             <p className="mt-0.5 text-[10px] font-semibold text-[#777466]">per {selectedUnit.label}</p>
           </div>
