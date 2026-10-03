@@ -1,3 +1,3 @@
 import { createExpressHandler } from './_express.js';
 
-export default createExpressHandler('/api');
+export default createExpressHandler('/api/products');

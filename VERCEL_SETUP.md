@@ -62,3 +62,18 @@ GOOGLE_CLIENT_SECRET
 
 Do not commit `.env`. The app serves images from tracked `/public/images` files,
 and browser URLs must remain `/images/<filename>` — never `/public/images/...`.
+
+## Verify after deployment
+
+Open these URLs after Vercel finishes building:
+
+```text
+https://hng-task-02-gu28.vercel.app/api/health
+https://hng-task-02-gu28.vercel.app/api/products
+https://hng-task-02-gu28.vercel.app/images/jollof-rice-plantain.jpg
+```
+
+The first two must return JSON and the last one must return an image. The health
+response should report `supabaseConfigured: true`, `mailgunConfigured: true` and
+`persistence: "postgres"`. If the health URL is `404`, the new commit is not the
+deployment serving the domain.

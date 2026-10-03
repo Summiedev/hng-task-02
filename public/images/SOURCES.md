@@ -10,6 +10,8 @@ of hotlinking image hosts. No AI-generated product photography is used.
 - `garri-seller-ilorin.jpg` — [Garri seller truck in Ilorin](https://commons.wikimedia.org/wiki/File:Garri_seller_truck_in_Ilorin.jpg), Wikimedia Commons, CC BY-SA.
 - `plantain-market.jpg` — [Plantain Seller at the Market](https://commons.wikimedia.org/wiki/File:Plantain_Seller_at_the_Market.jpg), Johnnybam, CC BY-SA 4.0.
 - `palm-oil-bottles.jpg` — [Bottled Palm-oil](https://commons.wikimedia.org/wiki/File:Bottled_Palm-oil.jpg), Ei'eke, CC BY-SA 4.0.
+- `jollof-rice-plantain.jpg` — [Jollof rice and plantain](https://commons.wikimedia.org/wiki/File:Jollof_rice_and_plantain.jpg), Wikimedia Commons, Nigerian food photograph.
+- `egusi-eba.jpg` — [Original Nigerian Egusi soup and yellow garri (Eba)](https://commons.wikimedia.org/wiki/File:Original_Nigerian_Egusi_soup_and_yellow_garri_(Eba).jpg), PrincewillJohn25, CC BY-SA 4.0.
 
 The catalogue uses these images as Nigerian market reference photography. When
 Koko Market has its own product photography, replace the local file while

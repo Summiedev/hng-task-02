@@ -3,7 +3,9 @@ export async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit)
   const contentType = response.headers.get('content-type') || '';
 
   if (!response.ok) {
-    let message = `Request failed (${response.status})`;
+    let message = response.status === 404
+      ? 'The Koko Market API route is not deployed yet. Redeploy the latest Vercel build.'
+      : `Request failed (${response.status})`;
     if (contentType.includes('application/json')) {
       try {
         const payload = await response.json() as { error?: string; message?: string };

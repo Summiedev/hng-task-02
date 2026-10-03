@@ -27,20 +27,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
   };
 
   return (
-    <article className="group flex min-w-0 flex-col rounded-[1.25rem] border border-[#e1d8c9] bg-[#fffdf8] p-2.5 shadow-[0_10px_30px_rgba(60,45,20,0.04)] transition hover:-translate-y-0.5 hover:border-[#cdbda7]">
+    <article className="group flex min-w-0 flex-col rounded-[1.25rem] border border-[#e1d8c9] bg-[#fffdf8] p-2 shadow-[0_10px_30px_rgba(60,45,20,0.04)] transition hover:-translate-y-0.5 hover:border-[#cdbda7] sm:p-2.5">
       <button type="button" onClick={() => onSelect(product)} className="relative block aspect-[1.08] overflow-hidden rounded-[0.9rem] bg-[#e8dfcf] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8472e]">
         <ProductImage src={product.image} alt={`${product.name} in a market-style food photo`} placeholderLabel={product.name} className="transition duration-500 group-hover:scale-[1.04]" loading="lazy" />
         <span className="absolute left-2.5 top-2.5 rounded-full bg-[#fff9ed]/95 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#4d5649]">{product.stock > 0 ? 'In stock' : 'Sold out'}</span>
       </button>
 
       <div className="flex flex-1 flex-col px-1 pb-1 pt-3">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-2 min-[390px]:flex-row min-[390px]:items-start min-[390px]:justify-between min-[390px]:gap-3">
           <button type="button" onClick={() => onSelect(product)} className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8472e]">
             <p className="text-[10px] font-black uppercase tracking-[0.13em] text-[#b8472e]">{product.category_slug.replaceAll('-', ' ')}</p>
-            <h3 className="mt-1 font-display text-[1.35rem] font-bold leading-[0.96] tracking-[-0.035em] text-[#1d2a1d]">{product.name}</h3>
+            <h3 className="mt-1 font-display text-[1.15rem] font-bold leading-[0.98] tracking-[-0.035em] text-[#1d2a1d] sm:text-[1.35rem]">{product.name}</h3>
           </button>
-          <div className="shrink-0 text-right">
-            <p className="text-base font-black text-[#1d2a1d]">{formatNaira(selectedUnit.price)}</p>
+          <div className="shrink-0 text-left min-[390px]:text-right">
+            <p className="text-[0.95rem] font-black text-[#1d2a1d] sm:text-base">{formatNaira(selectedUnit.price)}</p>
             <p className="mt-0.5 text-[10px] font-semibold text-[#777466]">per {selectedUnit.label}</p>
           </div>
         </div>

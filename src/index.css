@@ -1,24 +1,63 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", Georgia, serif;
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
-:root { color-scheme: light; font-synthesis: none; text-rendering: optimizeLegibility; }
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --koko-cream: #fbf7ef;
+  --koko-surface: #fffdf8;
+  --koko-soft: #f3eadb;
+  --koko-green: #123c32;
+  --koko-green-2: #285244;
+  --koko-tomato: #d9573d;
+  --koko-tomato-deep: #aa3d2c;
+  --koko-gold: #d79c51;
+  --koko-border: #e2d5c0;
+  --koko-muted: #6d7168;
+  --koko-image: #e9dfcf;
+}
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; overflow-x: hidden; background: #fffaf2; color: #1d2a1d; font-family: var(--font-sans); }
+body { margin: 0; min-width: 320px; overflow-x: hidden; background: var(--koko-cream); color: var(--koko-green); font-family: var(--font-sans); }
 button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button:disabled { cursor: not-allowed; }
-::selection { background: #b8472e; color: #fffaf2; }
-*:focus-visible { outline: 2px solid #b8472e; outline-offset: 3px; }
+::selection { background: var(--koko-tomato); color: var(--koko-cream); }
+*:focus-visible { outline: 2px solid var(--koko-tomato); outline-offset: 3px; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f0e8db; }
 ::-webkit-scrollbar-thumb { background: #c7b9a5; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #b8472e; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+[class~="bg-[#fffaf2]"] { background-color: var(--koko-cream) !important; }
+[class~="bg-[#fffaf2]/95"] { background-color: color-mix(in srgb, var(--koko-cream) 95%, transparent) !important; }
+[class~="bg-[#fff9ed]"], [class~="bg-[#fffdf8]"] { background-color: var(--koko-surface) !important; }
+[class~="bg-[#f3ecdf]"] { background-color: var(--koko-soft) !important; }
+[class~="bg-[#e8dfcf]"] { background-color: var(--koko-image) !important; }
+[class~="bg-[#e9efe3]"] { background-color: #e5efe8 !important; }
+[class~="bg-[#f0d3a6]"] { background-color: #f1d4a5 !important; }
+[class~="bg-[#1d2a1d]"] { background-color: var(--koko-green) !important; }
+[class~="bg-[#1d2a1d]/60"], [class~="bg-[#1d2a1d]/65"], [class~="bg-[#1d2a1d]/70"] { background-color: color-mix(in srgb, var(--koko-green) 68%, transparent) !important; }
+[class~="bg-[#b8472e]"] { background-color: var(--koko-tomato) !important; }
+[class~="bg-[#91341f]"] { background-color: var(--koko-tomato-deep) !important; }
+[class~="text-[#1d2a1d]"] { color: var(--koko-green) !important; }
+[class~="text-[#394437]"] { color: var(--koko-green-2) !important; }
+[class~="text-[#b8472e]"] { color: var(--koko-tomato) !important; }
+[class~="text-[#777466]"], [class~="text-[#6e6d63]"], [class~="text-[#65695d]"] { color: var(--koko-muted) !important; }
+[class~="text-[#75916b]"] { color: #3e765d !important; }
+[class~="text-[#efad67]"], [class~="text-[#f0d3a6]"] { color: #b8742f !important; }
+[class~="border-[#e1d8c9]"], [class~="border-[#dfd5c5]"], [class~="border-[#e5dccd]"], [class~="border-[#eee6d9]"] { border-color: var(--koko-border) !important; }
+[class~="border-[#d9cfbf]"], [class~="border-[#cfc4b3]"], [class~="border-[#d8cebf]"], [class~="border-[#d2c7b6]"] { border-color: #d5c7b2 !important; }
+@media (max-width: 379px) {
+  [class~="grid-cols-2"] { grid-template-columns: minmax(0, 1fr) !important; }
+  .max-w-\[1440px\] { max-width: 100%; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

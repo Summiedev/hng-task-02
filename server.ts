@@ -87,6 +87,17 @@ async function getUserIdFromReq(req: Request): Promise<string | null> {
 
 // ---------------- API ROUTES ----------------
 
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({
+    ok: true,
+    app: 'KOKO MARKET',
+    service: 'api',
+    supabaseConfigured: Boolean(supabaseClient),
+    mailgunConfigured: Boolean(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN),
+    persistence: db.persistenceMode,
+  });
+});
+
 // Config
 app.get('/api/config', (_req: Request, res: Response) => {
   res.json({

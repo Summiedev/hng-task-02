@@ -54,6 +54,10 @@ class DatabaseService {
     await this.initialization;
   }
 
+  public get persistenceMode(): 'postgres' | 'local' {
+    return this.isPostgres ? 'postgres' : 'local';
+  }
+
   private ensureDir() {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
