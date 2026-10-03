@@ -72,6 +72,12 @@ SUPABASE_SERVICE_ROLE_KEY # Server-only; never expose this to the browser
 Do not commit `.env`. The app serves images from tracked `/public/images` files,
 and browser URLs must remain `/images/<filename>` — never `/public/images/...`.
 
+## Serverless function limit
+
+All API routes are intentionally served by the single `api/[...path].ts`
+function. Keep new Express routes in `server.ts`; do not create a separate file
+under `api/` for each endpoint.
+
 ## Verify after deployment
 
 Open these URLs after Vercel finishes building:
