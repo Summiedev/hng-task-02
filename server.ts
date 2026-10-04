@@ -294,12 +294,12 @@ app.get('/api/orders/mine', async (req: Request, res: Response) => {
 app.get('/api/auth/me', async (req: Request, res: Response) => {
   const userId = await getUserIdFromReq(req);
   if (!userId) {
-    return res.status(401).json({ authenticated: false });
+    return res.json({ authenticated: false });
   }
 
   const user = await db.getUserById(userId);
   if (!user) {
-    return res.status(401).json({ authenticated: false });
+    return res.json({ authenticated: false });
   }
 
   res.json({ authenticated: true, user });
