@@ -74,9 +74,24 @@ and browser URLs must remain `/images/<filename>` — never `/public/images/...`
 
 ## Serverless function limit
 
-All API routes are intentionally served by the single `api/[...path].ts`
-function. Keep new Express routes in `server.ts`; do not create a separate file
-under `api/` for each endpoint.
+Express owns the API implementation in `server.ts`. The `api/[...path].ts`
+function is the general entrypoint, and nested browser routes have explicit
+Vercel wrappers that dispatch into the same Express app:
+
+```text
+api/auth/google.ts
+api/auth/me.ts
+api/auth/supabase.ts
+api/auth/logout.ts
+api/orders/mine.ts
+api/orders/by-number/[orderNumber].ts
+api/products/[slug].ts
+```
+
+These wrappers keep nested routes visible to Vercel while sharing the same
+implementation. When adding a nested route used by the browser, add a matching
+wrapper under `api/` and dispatch it with `server/vercel.ts`. Keep the total
+number of function entrypoints within the deployment's plan limit.
 
 ## Verify after deployment
 

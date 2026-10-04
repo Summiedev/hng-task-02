@@ -4,9 +4,9 @@ type VercelRequest = { url?: string } & Record<string, unknown>;
 type VercelResponse = unknown;
 
 /**
- * This is deliberately the only serverless entrypoint. Vercel forwards every
- * `/api/*` request here, and Express continues to own the actual route table.
- * Keeping the router in one function avoids Vercel's hobby-plan function cap.
+ * General API entrypoint for the Express router. Nested routes used by the
+ * browser also have explicit Vercel wrappers so they appear in deployments
+ * that do not resolve this catch-all for deeper paths.
  */
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const originalUrl = req.url || '/';

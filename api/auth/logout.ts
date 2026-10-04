@@ -4,10 +4,6 @@ import { dispatchApiRoute } from '../../server/vercel.js';
 type VercelRequest = { url?: string } & Record<string, unknown>;
 type VercelResponse = unknown;
 
-/**
- * Expose Google credential sign-in as an explicit Vercel function route.
- * The API catch-all remains the entrypoint for the other Express routes.
- */
 export default function handler(req: VercelRequest, res: VercelResponse) {
-  return dispatchApiRoute(app, req as never, res as never, '/api/auth/google');
+  return dispatchApiRoute(app, req as never, res as never, '/api/auth/logout');
 }
