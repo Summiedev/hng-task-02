@@ -7,6 +7,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { createClient } from '@supabase/supabase-js';
 import { db } from './server/db.js';
 import { sendOrderConfirmationEmail } from './server/mailgun.js';
+import type { User } from './src/types/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,13 +43,27 @@ app.use('/api', async (_req: Request, _res: Response, next) => {
 // In-memory session store (simple token -> userId mapping for robust session management)
 const sessionTokens = new Map<string, string>();
 
-function createSessionToken(userId: string) {
-  const payload = Buffer.from(JSON.stringify({ userId, exp: Date.now() + 1000 * 60 * 60 * 24 * 30 })).toString('base64url');
+type SessionClaims = { userId: string; exp: number; user?: User };
+
+function createSessionToken(user: User) {
+  const claims: SessionClaims = {
+    userId: user.id,
+    exp: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    user: {
+      id: user.id,
+      google_id: user.google_id,
+      email: user.email,
+      name: user.name,
+      avatar_url: user.avatar_url,
+      created_at: user.created_at,
+    },
+  };
+  const payload = Buffer.from(JSON.stringify(claims)).toString('base64url');
   const signature = crypto.createHmac('sha256', sessionSecret).update(payload).digest('base64url');
   return `koko_${payload}.${signature}`;
 }
 
-function verifySessionToken(token: string): string | null {
+function verifySessionToken(token: string): SessionClaims | null {
   if (!token.startsWith('koko_')) return null;
   const value = token.slice(5);
   const [payload, signature] = value.split('.');
@@ -56,19 +71,27 @@ function verifySessionToken(token: string): string | null {
   const expected = crypto.createHmac('sha256', sessionSecret).update(payload).digest('base64url');
   if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
   try {
-    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { userId?: string; exp?: number };
-    return parsed.userId && parsed.exp && parsed.exp > Date.now() ? parsed.userId : null;
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Partial<SessionClaims>;
+    return typeof parsed.userId === 'string' && typeof parsed.exp === 'number' && parsed.exp > Date.now()
+      ? parsed as SessionClaims
+      : null;
   } catch {
     return null;
   }
+}
+
+function getSignedInUserFromReq(req: Request): User | null {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifySessionToken(authHeader.substring(7))?.user || null;
 }
 
 async function getUserIdFromReq(req: Request): Promise<string | null> {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
-    const signedUserId = verifySessionToken(token);
-    if (signedUserId) return signedUserId;
+    const signedSession = verifySessionToken(token);
+    if (signedSession) return signedSession.userId;
     const legacyUserId = sessionTokens.get(token);
     if (legacyUserId) return legacyUserId;
     if (supabaseClient) {
@@ -268,7 +291,7 @@ app.get('/api/orders/mine', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Please sign in to view your orders' });
     }
 
-    const user = await db.getUserById(userId);
+    const user = await db.getUserById(userId) || getSignedInUserFromReq(req);
     if (!user) {
       return res.status(401).json({ error: 'User session invalid' });
     }
@@ -297,7 +320,7 @@ app.get('/api/auth/me', async (req: Request, res: Response) => {
     return res.json({ authenticated: false });
   }
 
-  const user = await db.getUserById(userId);
+  const user = await db.getUserById(userId) || getSignedInUserFromReq(req);
   if (!user) {
     return res.json({ authenticated: false });
   }
@@ -343,7 +366,7 @@ app.post('/api/auth/google', async (req: Request, res: Response) => {
       avatar_url: payload.picture,
     });
 
-    const token = createSessionToken(user.id);
+    const token = createSessionToken(user);
     sessionTokens.set(token, user.id);
 
     res.json({
@@ -366,7 +389,7 @@ app.post('/api/auth/supabase', async (req: Request, res: Response) => {
     if (!userId) return res.status(401).json({ error: 'Supabase session is invalid or expired' });
     const user = await db.getUserById(userId);
     if (!user) return res.status(401).json({ error: 'Could not create a Koko account session' });
-    const token = createSessionToken(user.id);
+    const token = createSessionToken(user);
     sessionTokens.set(token, user.id);
     res.json({ success: true, token, user });
   } catch (err: any) {
